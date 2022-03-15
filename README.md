@@ -1,1 +1,1 @@
-# traffic-forecasting-gnn
+# 10-707 Final Project: Traffic Forecasting
