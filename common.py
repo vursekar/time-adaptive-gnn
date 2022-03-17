@@ -2,11 +2,13 @@ import os
 
 # CONSTANTS (modify as needed)
 
-# DATA_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/data"
-DATA_DIRECTORY = r"C:\Users\shali\Documents\CMU_10-707_Project\data"
+DATA_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/raw_data"
+#DATA_DIRECTORY = r"C:\Users\shali\Documents\CMU_10-707_Project\data"
+# DATASET_NAME = "PEMS-BAY"
 DATASET_NAME = "METR-LA"
-OUTPUT_DIRECTORY = DATA_DIRECTORY
-PLOTS_DIRECTORY = OUTPUT_DIRECTORY
+OUTPUT_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/processed_data"
+PLOTS_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/plots"
+SENSOR_LOCATIONS_FILE = '/Users/varunursekar/Projects/advDeepLearning/final_project/DCRNN-master/data/sensor_graph/graph_sensor_locations.csv'
 
 PREPROCESSED_DATASET_FILENAME = DATASET_NAME + "_preprocessed.npz"
 PREPROCESSING_SCALER_FILENAME = DATASET_NAME + "_scaler.pk"
