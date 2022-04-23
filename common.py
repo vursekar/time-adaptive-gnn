@@ -8,6 +8,7 @@ DATA_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/raw
 DATASET_NAME = "METR-LA"
 OUTPUT_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/processed_data"
 PLOTS_DIRECTORY = "/Users/varunursekar/Projects/advDeepLearning/final_project/plots"
+# SENSOR_LOCATIONS_FILE = '/Users/varunursekar/Projects/advDeepLearning/final_project/DCRNN-master/data/sensor_graph/graph_sensor_locations_bay.csv'
 SENSOR_LOCATIONS_FILE = '/Users/varunursekar/Projects/advDeepLearning/final_project/DCRNN-master/data/sensor_graph/graph_sensor_locations.csv'
 
 PREPROCESSED_DATASET_FILENAME = DATASET_NAME + "_preprocessed.npz"
