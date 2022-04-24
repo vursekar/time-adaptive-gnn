@@ -145,7 +145,7 @@ class STGCN(tf.keras.Model):
         Expected that last few input dimensions are time features
         """
 
-        if self.time_modulation:
+        if self.time_modulation and self.adapt_adj:
             time_input = x[:,:,-1,-self.num_time_dims:]
             x = x[:,:,:,:-self.num_time_dims]
 
@@ -158,11 +158,14 @@ class STGCN(tf.keras.Model):
             E1 = self.E1 * self.time_mod1(time_input1)
             E2 = self.E2 * self.time_mod2(time_input2)
 
-        else:
-            E1 = self.E1
-            E2 = self.E2
+            self.A = self.I + softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
 
-        self.A = self.I + softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
+        elif self.adapt_adj:
+
+            self.A = self.I + softmax(relu(tf.matmul(self.E1, self.E2, transpose_b=True)),axis=1)
+            
+        else:
+            pass
 
         for i in range(self.num_blocks):
             x = self.block_layers[i](x, self.A, batched_A=self.time_modulation)

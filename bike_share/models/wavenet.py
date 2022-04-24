@@ -156,13 +156,14 @@ class GraphWaveNet(tf.keras.Model):
             paddings = tf.constant([[0,0],[0,0],[self.receptive_field-num_steps,0],[0,0]])
             x = tf.pad(x, paddings)
 
-        x = self.lt(x)
-        skip = 0
-
-
         if self.time_modulation:
             time_input = x[:,:,-1,-self.num_time_dims:]
             x = x[:,:,:,:-self.num_time_dims]
+
+        x = self.lt(x)
+        skip = 0
+
+        if self.time_modulation:
 
             time_input1 = tf.einsum('bnk, nd->bnkd',time_input,self.E1)
             time_input2 = tf.einsum('bnk, nd->bnkd',time_input,self.E2)
@@ -173,7 +174,7 @@ class GraphWaveNet(tf.keras.Model):
             E1 = self.E1 * self.time_mod1(time_input1)
             E2 = self.E2 * self.time_mod2(time_input2)
 
-            self.A = self.I + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(E1, E2,transpose_b=True)),axis=1)
+            self.A = self.I[tf.newaxis, :, :] + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(E1, E2,transpose_b=True)),axis=1)
 
         else:
             self.A = self.I + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(self.E1, self.E2,transpose_b=True)),axis=1)
