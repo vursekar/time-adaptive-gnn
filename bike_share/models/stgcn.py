@@ -163,7 +163,7 @@ class STGCN(tf.keras.Model):
         elif self.adapt_adj:
 
             self.A = self.I + softmax(relu(tf.matmul(self.E1, self.E2, transpose_b=True)),axis=1)
-            
+
         else:
             pass
 
