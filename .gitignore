@@ -1,3 +1,7 @@
+bike_share/processed_data/
+bike_share/stored_models/
+
+# BEGIN STANDARD GITHUB PYTHON GITIGNORE
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -28,8 +28,8 @@ def make_windows(X, window_length):
         covariates.append(X[:, i:i + window_length])
         labels.append(X[:, i + window_length:i + window_length + window_length])
 
-    covariates = np.array(covariates)
-    labels = np.array(labels)
+    covariates = np.array(covariates, dtype=np.float32) # float64 takes too much space to store, hence using float32
+    labels = np.array(labels, dtype=np.float32)
     return covariates, labels
 
 def add_time_information(X, periods, keep_original_time=False):
