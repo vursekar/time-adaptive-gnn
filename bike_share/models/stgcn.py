@@ -11,6 +11,7 @@ default_params = {'num_nodes': 300,
                   'block_kernels': [3,3],
                   'A': None,
                   'emb_dim': 32,
+                  'add_identity': True,
                   'time_modulation': False,
                   'time_mod_layers': 0,
                   'time_mod_activations':['relu','sigmoid'] ,
@@ -94,6 +95,13 @@ class STGCN(tf.keras.Model):
         self.block_kernels = params['block_kernels']
 
         self.A = params['A']
+        self.add_identity = params['add_identity']
+
+        if self.add_identity:
+            self.I = tf.eye(self.num_nodes)
+        else:
+            self.I = 0.
+
         self.adapt_adj = self.A is None
         self.emb_dim = params['emb_dim']
         self.time_modulation = params['time_modulation'] and (self.num_time_dims>0)
@@ -154,7 +162,7 @@ class STGCN(tf.keras.Model):
             E1 = self.E1
             E2 = self.E2
 
-        self.A = softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
+        self.A = self.I + softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
 
         for i in range(self.num_blocks):
             x = self.block_layers[i](x, self.A, batched_A=self.time_modulation)

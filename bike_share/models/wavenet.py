@@ -17,7 +17,8 @@ default_params = {'num_nodes': 300,
                   'time_mod_layers': 0,
                   'time_mod_activations': ['relu','sigmoid'],
                   'kernel_size': 2,
-                  'use_gc': True
+                  'use_gc': True,
+                  'add_identity': True
                   }
 
 class GraphConv(tf.keras.layers.Layer):
@@ -93,6 +94,13 @@ class GraphWaveNet(tf.keras.Model):
         self.time_mod_layers = params['time_mod_layers']
         self.time_mod_activations = params['time_mod_activations']
 
+        self.add_identity = params['add_identity']
+
+        if self.add_identity:
+            self.I = tf.eye(self.num_nodes)
+        else:
+            self.I = 0.
+
         self.E1 = tf.Variable(initial_value=tf.keras.initializers.RandomNormal(stddev=1)(shape=(self.num_nodes, self.emb_dim),
                                                                                    dtype="float32"),trainable=True)
         self.E2 = tf.Variable(initial_value=tf.keras.initializers.RandomNormal(stddev=1)(shape=(self.num_nodes, self.emb_dim),
@@ -165,10 +173,10 @@ class GraphWaveNet(tf.keras.Model):
             E1 = self.E1 * self.time_mod1(time_input1)
             E2 = self.E2 * self.time_mod2(time_input2)
 
-            self.A = tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(E1, E2,transpose_b=True)),axis=1)
+            self.A = self.I + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(E1, E2,transpose_b=True)),axis=1)
 
         else:
-            self.A = tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(self.E1, self.E2,transpose_b=True)),axis=1)
+            self.A = self.I + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(self.E1, self.E2,transpose_b=True)),axis=1)
 
 
         for i in range(self.depth):
