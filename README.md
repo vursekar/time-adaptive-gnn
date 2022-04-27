@@ -5,7 +5,7 @@
 ## bike_share folder (for final report)
 
 
-## traffic_forecasting folder (for final report)
+## traffic_forecasting folder (for midway report)
 
 common.py contains constants (dataset file paths and such) to be used throughout this project.
 
