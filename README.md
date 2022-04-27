@@ -4,13 +4,19 @@
 
 ## bike_share folder (for final report)
 
-construct_full_dataset.ipynb provides code to compile the raw csv files into time-binned counts
+models is a folder containing all used models as classes.
 
-models is a folder containing all used models as classes 
+helper_utils is a folder containing utilities for data preprocessing.
 
-helper_utils is a folder containing utilities for data preprocessing
+evaluation is a folder containing utilities for model evaluation.
 
-model-test.ipynb provides code to import and train models
+construct_full_dataset.ipynb is used to compile the raw csv files into time-binned counts.
+
+final_data_processing.ipynb is used to take the time-binned counts and process them to generate the input to our ML models.
+
+model-test.ipynb is used to import and train our ML models.
+
+evaluate_models.ipynb is used to evaluate the performance of our ML models.
 
 
 
