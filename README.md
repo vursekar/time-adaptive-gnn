@@ -1,5 +1,12 @@
 # 10-707 Final Project: Time-Adaptive GNNs
 
+
+
+## Bike Share
+
+
+## Traffic Forecasting
+
 common.py contains constants (dataset file paths and such) to be used throughout this project.
 
 util.py contains utility functions/classes to be used throughout this project.
