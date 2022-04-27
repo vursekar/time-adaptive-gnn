@@ -4,6 +4,15 @@
 
 ## bike_share folder (for final report)
 
+construct_full_dataset.ipynb provides code to compile the raw csv files into time-binned counts
+
+models is a folder containing all used models as classes 
+
+helper_utils is a folder containing utilities for data preprocessing
+
+model-test.ipynb provides code to import and train models
+
+
 
 ## traffic_forecasting folder (for midway report)
 
