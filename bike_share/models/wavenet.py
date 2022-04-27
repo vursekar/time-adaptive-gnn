@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras.activations import relu, softmax
 
 
 default_params = {'num_nodes': 300,
@@ -16,6 +17,7 @@ default_params = {'num_nodes': 300,
                   'time_modulation': False,
                   'time_mod_layers': 0,
                   'time_mod_activations': ['relu','sigmoid'],
+                  'additive_modulation': False,
                   'kernel_size': 2,
                   'use_gc': True,
                   'add_identity': True
@@ -29,13 +31,14 @@ class GraphConv(tf.keras.layers.Layer):
         self.out_dim = out_dim
         self.W = tf.keras.layers.Conv2D(out_dim, kernel_size=(1, 1))
 
-    def forward(self, x, A, batched_A):
+    def call(self, x, A, batched_A):
 
         if batched_A:
             out = tf.einsum('bnm,bmtd->bntd',A,x)
         else:
             out = tf.einsum('nm,bmtd->bntd',A,x)
-
+            
+        out = tf.concat([x,out],axis=-1)
         out = self.W(out)
         return out
 
@@ -93,6 +96,7 @@ class GraphWaveNet(tf.keras.Model):
         self.time_modulation = params['time_modulation']
         self.time_mod_layers = params['time_mod_layers']
         self.time_mod_activations = params['time_mod_activations']
+        self.additive_modulation = params['additive_modulation']
 
         self.add_identity = params['add_identity']
 
@@ -118,9 +122,9 @@ class GraphWaveNet(tf.keras.Model):
         self.lt = tf.keras.layers.Conv2D(filters=self.res_channels,kernel_size=(1,1))
 
         if not self.use_gc:
-            self.res_convs = [tf.keras.layers.Conv1D(filters=self.res_channels, kernel_size=1) for _ in range(self.depth)]
+            self.res_convs = [tf.keras.layers.Conv1D(filters=self.res_channels, kernel_size=(1,)) for _ in range(self.depth)]
 
-        self.skip_convs = [tf.keras.layers.Conv1D(filters=self.skip_channels, kernel_size=1) for _ in range(self.depth)]
+        self.skip_convs = [tf.keras.layers.Conv1D(filters=self.skip_channels, kernel_size=(1,)) for _ in range(self.depth)]
         self.graph_convs = [GraphConv(self.res_channels) for _ in range(self.depth)]
         self.bns = [tf.keras.layers.BatchNormalization() for _ in range(self.depth)]
 
@@ -134,11 +138,12 @@ class GraphWaveNet(tf.keras.Model):
             dilation = 1
 
             for l in range(self.num_layers):
-
-                self.filter_convs.append(tf.keras.layers.Conv2D(self.dilation_channels,kernel_size=(1,self.kernel_size),
+                
+                self.filter_convs.append(tf.keras.layers.Conv1D(self.dilation_channels,kernel_size=(self.kernel_size),
                                                                dilation_rate=dilation, activation='tanh'))
-                self.gate_convs.append(tf.keras.layers.Conv2D(self.dilation_channels,kernel_size=(1,self.kernel_size),
+                self.gate_convs.append(tf.keras.layers.Conv1D(self.dilation_channels,kernel_size=(self.kernel_size),
                                                                dilation_rate=dilation, activation='sigmoid'))
+                
                 dilation = 2*dilation
                 receptive_field += scope
                 scope = 2*scope
@@ -171,37 +176,43 @@ class GraphWaveNet(tf.keras.Model):
             time_input1 = self.time_mod_reshaper(time_input1)
             time_input2 = self.time_mod_reshaper(time_input2)
 
-            E1 = self.E1 * self.time_mod1(time_input1)
-            E2 = self.E2 * self.time_mod2(time_input2)
+            if self.additive_modulation:
+                E1 = self.E1 + self.time_mod1(time_input1)
+                E2 = self.E2 + self.time_mod2(time_input2)
+            else:
+                E1 = self.E1 * self.time_mod1(time_input1)
+                E2 = self.E2 * self.time_mod2(time_input2)
 
-            self.A = self.I[tf.newaxis, :, :] + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(E1, E2,transpose_b=True)),axis=1)
+            self.A = self.I + softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
 
         else:
-            self.A = self.I + tf.keras.activations.softmax(tf.keras.activations.relu(tf.matmul(self.E1, self.E2,transpose_b=True)),axis=1)
+            self.A = self.I + softmax(relu(tf.matmul(self.E1, self.E2, transpose_b=True)),axis=1)
 
-
+        
         for i in range(self.depth):
 
             residual = x
+            
             fltr = self.filter_convs[i](residual)
             gate = self.gate_convs[i](residual)
-            x = fltr*gate
-
-            s = self.skip_convs[i](x)
-
+            x = fltr * gate
+            
+            s = x
+            s = self.skip_convs[i](s)
+            
             if i>0:
                 skip = skip[:, :, -s.shape[2]:, :]
-            else:
-                skip = 0
-
+                
             skip = skip + s
-
+            
+            if i == (self.depth - 1):
+                break
+                
             if self.use_gc:
-                graph_out = self.graph_convs[i](x, self.A, batched_A=self.time_modulation)
-                x = x + graph_out
+                x = self.graph_convs[i](x, self.A, batched_A=self.time_modulation)
             else:
                 x = self.res_convs[i](x)
-
+            
             x = x + residual[:, :, -x.shape[2]:, :]
 
             x = self.bns[i](x)

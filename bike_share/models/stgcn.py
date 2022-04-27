@@ -15,6 +15,7 @@ default_params = {'num_nodes': 300,
                   'time_modulation': False,
                   'time_mod_layers': 0,
                   'time_mod_activations':['relu','sigmoid'] ,
+                  'additive_modulation': False,
                   'l2_reg': 0.00}
 
 
@@ -95,6 +96,10 @@ class STGCN(tf.keras.Model):
         self.block_kernels = params['block_kernels']
 
         self.A = params['A']
+        
+        if self.A is not None:
+            self.A = tf.convert_to_tensor(self.A, dtype=tf.float32)
+        
         self.add_identity = params['add_identity']
 
         if self.add_identity:
@@ -107,6 +112,7 @@ class STGCN(tf.keras.Model):
         self.time_modulation = params['time_modulation'] and (self.num_time_dims>0)
         self.time_mod_layers = params['time_mod_layers']
         self.time_mod_activations = params['time_mod_activations']
+        self.additive_modulation = params['additive_modulation']
 
         if self.adapt_adj:
 
@@ -155,8 +161,12 @@ class STGCN(tf.keras.Model):
             time_input1 = self.time_mod_reshaper(time_input1)
             time_input2 = self.time_mod_reshaper(time_input2)
 
-            E1 = self.E1 * self.time_mod1(time_input1)
-            E2 = self.E2 * self.time_mod2(time_input2)
+            if self.additive_modulation:
+              E1 = self.E1 + self.time_mod1(time_input1)
+              E2 = self.E2 + self.time_mod2(time_input2)
+            else:
+              E1 = self.E1 * self.time_mod1(time_input1)
+              E2 = self.E2 * self.time_mod2(time_input2)
 
             self.A = self.I + softmax(relu(tf.matmul(E1, E2, transpose_b=True)),axis=1)
 
