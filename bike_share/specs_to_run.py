@@ -1,6 +1,6 @@
 import numpy as np
 
-adj = np.load('./processed_data/trip_counts_201701_201812_top_300.npy')
+adj = np.load('./adjacency_matrices/trip_counts_201701_201812_top_300.npy')
 adj = adj/np.sum(adj,axis=1,keepdims=True)
 adj = adj + np.eye(adj.shape[0])
 
@@ -16,13 +16,13 @@ base_specs = {'save_model': True,
 
 
 def mergeDicts(dict1,dict2=base_specs):
-    
+
     dict3 = {}
     for key in dict1:
         dict3[key] = dict1[key]
     for key in dict2:
         dict3[key] = dict2[key]
-    
+
     return dict3
 
 
@@ -32,7 +32,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'input_features': 4,
                                       'output_features': 2,
                                       'l2_reg': 0.00}],
-                 
+
                  'FNN_noreg': [mergeDicts({'model_name': 'FNN_noreg', 'model_type': 'FNN'}),
                                      {'num_layers': 2,
                                       'units_per_layer':256,
@@ -41,7 +41,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'input_features': 4,
                                       'output_features': 2,
                                       'l2_reg': 0.00}],
-                 
+
                  'FNN_withreg': [mergeDicts({'model_name': 'FNN_withreg', 'model_type': 'FNN'}),
                                      {'num_layers': 2,
                                       'units_per_layer':256,
@@ -50,7 +50,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'input_features': 4,
                                       'output_features': 2,
                                       'l2_reg': 0.001}],
-                 
+
                  'FCLSTM': [mergeDicts({'model_name': 'FCLSTM', 'model_type': 'FCLSTM'}),
                                      {'num_layers': 2,
                                       'units_per_layer':16,
@@ -59,7 +59,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'input_features': 4,
                                       'output_features': 2,
                                       'l2_reg': 0.001}],
-                 
+
                  'STGCN_fixedA': [mergeDicts({'model_name': 'STGCN_fixedA', 'model_type': 'STGCN'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -77,7 +77,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'time_mod_activations':['relu','tanh'] ,
                                       'additive_modulation': False,
                                       'l2_reg': 0.00}],
-                 
+
                  'STGCN_adaptiveA': [mergeDicts({'model_name': 'STGCN_adaptiveA', 'model_type': 'STGCN'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -95,7 +95,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'time_mod_activations':['relu','tanh'] ,
                                       'additive_modulation': False,
                                       'l2_reg': 0.00}],
-                 
+
                  'STGCN_timeadaptiveA': [mergeDicts({'model_name': 'STGCN_timeadaptiveA', 'model_type': 'STGCN'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -113,7 +113,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'time_mod_activations':['relu','tanh'] ,
                                       'additive_modulation': False,
                                       'l2_reg': 0.00}],
-                  
+
                   'STGCN_timeadditiveA': [mergeDicts({'model_name': 'STGCN_timeadditiveA', 'model_type': 'STGCN'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -131,7 +131,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'time_mod_activations':['relu','linear'] ,
                                       'additive_modulation': True,
                                       'l2_reg': 0.00}],
-                  
+
                   'STGCN_plus': [mergeDicts({'model_name': 'STGCN_plus', 'model_type': 'STGCNPlus'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -150,7 +150,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'additive_modulation': False,
                                       'full_dynamic_adjacency': True,
                                       'l2_reg': 0.00}],
-                 
+
                  'GWN_adaptive': [mergeDicts({'model_name': 'GWN_adaptive', 'model_type': 'GraphWaveNet'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -172,7 +172,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'use_gc': True,
                                       'add_identity': True
                                       }],
-                 
+
                  'GWN_timeadaptive': [mergeDicts({'model_name': 'GWN_timeadaptive', 'model_type': 'GraphWaveNet'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -194,7 +194,7 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'use_gc': True,
                                       'add_identity': True
                                       }],
-                  
+
                   'GWN_timeadditive': [mergeDicts({'model_name': 'GWN_timeadditive', 'model_type': 'GraphWaveNet'}),
                                      {'num_nodes': 300,
                                       'num_steps': 10,
@@ -216,7 +216,6 @@ models_to_run = {'LinearRegressor': [mergeDicts({'model_name': 'LinearRegressor'
                                       'use_gc': True,
                                       'add_identity': True
                                       }],
-            
-                
-                }
 
+
+                }
