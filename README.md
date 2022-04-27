@@ -1,4 +1,4 @@
-# 10-707 Final Project: Traffic Forecasting
+# 10-707 Final Project: Time-Adaptive GNNs
 
 common.py contains constants (dataset file paths and such) to be used throughout this project.
 
