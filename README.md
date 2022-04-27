@@ -1,4 +1,26 @@
-# 10-707 Final Project: Traffic Forecasting
+# 10-707 Final Project: Time-Adaptive GNNs
+
+
+
+## bike_share folder (for final report)
+
+models is a folder containing all used models as classes.
+
+helper_utils is a folder containing utilities for data preprocessing.
+
+evaluation is a folder containing utilities for model evaluation.
+
+construct_full_dataset.ipynb is used to compile the raw csv files into time-binned counts.
+
+final_data_processing.ipynb is used to take the time-binned counts and process them to generate the input to our ML models.
+
+model-test.ipynb is used to import and train our ML models.
+
+evaluate_models.ipynb is used to evaluate the performance of our ML models.
+
+
+
+## traffic_forecasting folder (for midway report)
 
 common.py contains constants (dataset file paths and such) to be used throughout this project.
 
